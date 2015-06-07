@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name        = 'the-gipper'
   s.version     = '0.0.1'
   s.date        = '2015-06-06'
-  s.summary     = "Configuration Assurance"
+  s.summary     = "Configuration Verification"
   s.description = ""
   s.authors     = ["Trevor Grayson"]
   s.email       = 'trevor@trevorgrayson.com'

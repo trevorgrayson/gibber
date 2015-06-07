@@ -76,5 +76,9 @@ describe Gipper do
       expect(gipper.env[key]).to eq( config[key] )
       expect(gipper.env[key2]).to eq("env")
     end
+
+    it 'exports a config' do
+    end
   end
+
 end
