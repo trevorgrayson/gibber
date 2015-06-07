@@ -27,6 +27,13 @@ class Gipper
     end
   end
 
+  def self.review *args, &block
+    g = Gipper.new *args do
+      self.instance_eval &block
+    end
+    g.env
+  end
+
   def verify *fields
     options = fields[fields.size].is_a?(Hash) ? fields.delete(fields.size) : nil
 

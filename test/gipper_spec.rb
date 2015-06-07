@@ -20,7 +20,7 @@ describe Gipper do
         Gipper.logger = logger
 
         expect{
-          Gipper.new do
+          Gipper.review do
             verify *arg
           end
         }.to raise_error(GipperError)
@@ -37,7 +37,7 @@ describe Gipper do
         expect(logger).to receive(:warn).exactly(arg.count).times
 
         Gipper.logger = logger
-        Gipper.new do
+        Gipper.review do
           trust *arg
         end
 
@@ -48,12 +48,12 @@ describe Gipper do
 
   context 'cascade sets' do
     it 'last set out' do
-      gipper = Gipper.new first, last do
+      GIP = Gipper.review first, last do
         verify :a
       end
 
       last.each do |k,v|
-        expect(gipper.env[k]).to eq last[k]
+        expect(GIP[k]).to eq last[k]
       end
     end
 
@@ -70,11 +70,11 @@ describe Gipper do
       ENV[key]  = "env"
       ENV[key2] = "env"
 
-      gipper = Gipper.new config do 
+      GIP = Gipper.review config do 
       end
 
-      expect(gipper.env[key]).to eq( config[key] )
-      expect(gipper.env[key2]).to eq("env")
+      expect(GIP[key]).to eq( config[key] )
+      expect(GIP[key2]).to eq("env")
     end
 
     it 'exports a config' do
