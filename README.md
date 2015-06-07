@@ -25,7 +25,7 @@ config = {
   e: "thorton"
 }
 
-GIP = Gipper.new config, ENV do
+GIP = Gipper.review config, ENV do
   trust :e 
   verify :a, :b, :c, :d
   verify :env_var
