@@ -2,7 +2,7 @@ require 'logger'
 
 class Gipper
 
-  @logger = Logger.new(STDOUT)
+  @@logger = nil
 
   def initialize *args, &block
     reset
@@ -16,8 +16,14 @@ class Gipper
 
     if !@errors.empty?
       message = @errors.map{|k,v| "#{k} is #{v}"}.join(", ")[0..-1]
-      @logger.error message if @logger
+      @@logger.error message if @@logger
       raise GipperError, message
+    end
+
+    if !@warnings.empty?
+      @warnings.map{|k,v| 
+        @@logger.warn "#{k} is #{v}"
+      } if @@logger
     end
   end
 
@@ -29,7 +35,16 @@ class Gipper
         @errors[field] = "not set"
       end
     end
+  end
 
+  def trust *fields
+    options = fields[fields.size].is_a?(Hash) ? fields.delete(fields.size) : nil
+
+    fields.each do |field|
+      unless check_field field
+        @warnings[field] = "not set"
+      end
+    end
   end
 
   def check_field field
@@ -37,7 +52,7 @@ class Gipper
   end
 
   def reset
-    @env   = ENV.to_h
+    @env = ENV.to_h
     @errors = {}
     @warnings = {}
   end
@@ -47,6 +62,16 @@ class Gipper
   def env
     @env
   end
+
+  alias doveryai trust 
+  alias proveryai verify 
+
+  class << self
+    def logger=(logger=Logger.new(STDOUT))
+      @@logger=logger
+    end
+  end
+
 end
 
 class GipperError < StandardError
