@@ -70,14 +70,85 @@ describe Gipper do
       ENV[key]  = "env"
       ENV[key2] = "env"
 
-      GIP = Gipper.review config do 
+      gip = Gipper.review config do 
       end
 
-      expect(GIP[key]).to eq( config[key] )
-      expect(GIP[key2]).to eq("env")
+      expect(gip[key]).to eq( config[key] )
+      expect(gip[key2]).to eq("env")
     end
 
     it 'exports a config' do
+    end
+  end
+
+  context 'verify services' do
+    
+    before(:each) do
+      Gipper.logger = double("logger")
+    end
+
+    it 'throws on missing services' do
+      ENV["DATABASE_URL"] = "postgres://postgres:password@localhost:60001/some_db"
+      uri = URI.parse(ENV["DATABASE_URL"])
+
+      expect{
+        Gipper.review do
+          verify_service :DATABASE_URL
+        end
+      }.to raise_error #(GipperError)
+
+    end
+
+    it 'runs block on missing service' do
+      ENV["DATABASE_URL"] = "postgres://postgres:password@localhost:60001/some_db"
+      uri = URI.parse(ENV["DATABASE_URL"])
+
+      expect{
+        Gipper.review do
+          verify_service :DATABASE_URL do
+            Counter.inc
+          end
+        end
+      }.to raise_error #(GipperError)
+
+      expect(Counter.count).to eq(1)
+    end
+
+    it 'throws custom error message' do
+      skip
+      ENV["DATABASE_URL"] = "postgres://postgres:password@localhost:60001/some_db"
+      uri = URI.parse(ENV["DATABASE_URL"])
+
+      error_msg = "Oopsidoodle!"
+
+      expect{
+        Gipper.review do
+          verify_service :DATABASE_URL#, :error_message => error_msg
+        end
+      }.to raise_error #(GipperError)
+
+    end
+
+    it 'verifies good services' do
+      ENV["DATABASE_URL"] = "postgres://postgres:password@localhost:60001/some_db"
+      uri = URI.parse(ENV["DATABASE_URL"])
+
+      serve(uri.port)
+
+      Gipper.review do
+        verify_service :DATABASE_URL
+      end
+
+    end
+  end
+
+  def serve(port)
+    Thread.new do
+
+      server = TCPServer.open(port)
+      Thread.start(server.accept) do |client|
+        client.close
+      end
     end
   end
 

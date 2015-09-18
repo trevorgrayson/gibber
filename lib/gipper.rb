@@ -1,4 +1,8 @@
 require 'logger'
+require 'socket'
+require 'uri'
+require 'timeout'
+require './test/models/counter'
 
 class Gipper
 
@@ -34,6 +38,23 @@ class Gipper
     g.env
   end
 
+  def verify_service *fields, &block
+    options = fields[fields.size].is_a?(Hash) ? fields.delete(fields.size) : nil
+
+    fields.each do |field|
+      field = field.to_s
+      uri = URI.parse( check_field(field) )
+
+      unless is_port_open?( uri.host, uri.port )
+        @errors[field] = "isn't running" #options[:fail_message] ? options[:fail_message] : "isn't running"
+
+        if block
+          block.call
+        end
+      end
+    end
+  end
+
   def verify *fields
     options = fields[fields.size].is_a?(Hash) ? fields.delete(fields.size) : nil
 
@@ -41,6 +62,10 @@ class Gipper
       unless check_field field
         @errors[field] = "not set"
       end
+
+      #if options.respond_to? :probe && options[:probe]
+      #  @errors[field] = "does not respond on port blah"
+      #end
     end
   end
 
@@ -56,6 +81,25 @@ class Gipper
 
   def check_field field
     @env[field]
+  end
+
+  # Thanks to Chris Rice!
+  # http://stackoverflow.com/questions/517219/ruby-see-if-a-port-is-open
+  def is_port_open?(ip, port, timeout=1)
+    begin
+      Timeout::timeout(timeout) do
+        begin
+          s = TCPSocket.new(ip, port)
+          s.close
+          return true
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          return false
+        end
+      end
+    rescue Timeout::Error
+    end
+
+    return false
   end
 
   def reset

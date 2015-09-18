@@ -111,6 +111,3 @@ PLATFORMS
 DEPENDENCIES
   rails
   rspec
-
-BUNDLED WITH
-   1.10.2
