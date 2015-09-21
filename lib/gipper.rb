@@ -2,7 +2,6 @@ require 'logger'
 require 'socket'
 require 'uri'
 require 'timeout'
-require './test/models/counter'
 
 class Gipper
 

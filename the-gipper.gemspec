@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'the-gipper'
-  s.version     = '0.0.3'
+  s.version     = '0.0.4'
   s.date        = '2015-06-06'
   s.summary     = "Configuration Verification"
   s.description = ""

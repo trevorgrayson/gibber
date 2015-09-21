@@ -39,6 +39,25 @@ GIP["env_var"]
 
 ```
 
+Using Services? The Gipper can check if it's running on the port you expect it to be.
+
+```ruby
+GIP = Gipper.review config, ENV do
+  if Rails.env.production? 
+    #will simply throw an error if in production
+    verify_service :DATABASE_URL 
+  else
+    #will try to stand up the service using docker if not in production!
+    verify_service :DATABASE_URL do
+      Thread.start do
+        system 'docker', 'run', 'postgres'
+      end
+    end
+  end
+end
+
+```
+
 You may change the logger that Gipper uses by setting the logger.
 
 ```ruby

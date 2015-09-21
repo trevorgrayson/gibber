@@ -1,4 +1,5 @@
 require File.expand_path('../../lib/gipper', __FILE__)
+require './test/models/counter'
 
 describe Gipper do
   let(:first) { {a: "a", b: "b"} }
