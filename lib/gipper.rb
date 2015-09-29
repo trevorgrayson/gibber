@@ -102,7 +102,7 @@ class Gipper
   end
 
   def reset
-    @env = ENV.to_h
+    @env = ENV.is_a?(Hash) ? ENV : ENV.to_h
     @errors = {}
     @warnings = {}
   end
